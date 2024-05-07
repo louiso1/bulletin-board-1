@@ -21,13 +21,16 @@
         <input id="expires_field" type="date" name="expires_on">
       </div>
         <input id="ID_field" type="hidden" name="board_id" value="<%= @the_board.id %>">
+
+      <button>
+        Add post
+      </button>
     </form>
 
   </div>
 </div>
 
 <hr>
-
 
 <div>
   <div>
@@ -43,9 +46,9 @@
       <th>Expires on</th>
     </tr>
 
-    <% matching_post = Post.where({ :board_id => @the_board.id }).order({ :expires_on => :asc })%>
+    <% active_matching_post = Post.where({ :board_id => @the_board.id }).where("expires_on IS NULL OR expires_on >= ?", Date.today).order({ :expires_on => :asc })%>
 
-    <% matching_post.each do |a_post| %>
+    <% active_matching_post.each do |a_post| %>
       <tr>
         <td><%= a_post.title %></td>
         <td><%= a_post.body %></td>
@@ -53,9 +56,34 @@
         <td><%= a_post.expires_on %></td>
       </tr>
     <% end %>
+    </table>
+  </div>
+</div>
+
+<div>
+  <div>
+  <h2>Expired posts</h2>
+
+  <table border="1">
+    <tr>
+      <th>Title</th>
+      <th>Body</th>
+      <th>Posted on</th>
+      <th>Expires on</th>
+    </tr>
+
+    <% expired_matching_post = Post.where({ :board_id => @the_board.id }).where("expires_on IS NULL OR expires_on >= ?", Date.today)
+    .or(Post.where("expires_on < ?", Date.today)).order({ :expires_on => :asc })%>
+
+    <% expired_matching_post.each do |a_post_2| %>
+      <tr>
+        <td><%= a_post_2.title %></td>
+        <td><%= a_post_2.body %></td>
+        <td><%= a_post_2.created_at %></td>
+        <td><%= a_post_2.expires_on %></td>
+      </tr>
+    <% end %>
 
   </table>
-
-
   </div>
 </div>
